@@ -11,7 +11,7 @@ import os
 
 def csv_to_table(fileName, bachelorSource = False):
     output = None
-    
+
     fileDirPath = os.path.dirname(os.path.realpath(__file__))
     fullPath = os.path.join(fileDirPath, fileName)
     
@@ -20,13 +20,27 @@ def csv_to_table(fileName, bachelorSource = False):
     if bachelorSource:
         output = output[['Occupation Title', 'SOC Code', 'Typical entry-level education']]
         output['SOC Code'] = output.apply(lambda row: row['SOC Code'][2:9], axis = 1)
-    else:
-        output = output[['OCC_CODE', 'OCC_TITLE', 'OCC_GROUP', 'A_MEDIAN']]
-        output.columns = ['SOC Code', 'OCC_TITLE', 'OCC_GROUP', 'A_MEDIAN']
         
     return output
 
 def merge_master_year(master, join, joinYear):
+
+    if int(joinYear) >=2010:
+        join = join[['OCC_CODE', 'A_MEDIAN']]
+        join.columns = ['SOC Code', 'A_MEDIAN']
+
+    else:
+        join = join[['occ_code', 'a_median']]
+        join.columns = ['SOC Code', 'A_MEDIAN']
     output=  master.merge(join, how = 'inner', on= 'SOC Code',)
     output = output.rename(columns = {'A_MEDIAN': joinYear+'_median_income'})
+    return output
+
+def gather_ten():
+    output = csv_to_table('EmploymentProjections.csv', bachelorSource = True)
+
+    for i in range(11):
+        print(i)
+        output = merge_master_year(output, csv_to_table((str(2017-i) + '.csv')), str(2017-i))
+    
     return output
