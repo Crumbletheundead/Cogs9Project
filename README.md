@@ -4,6 +4,6 @@ Our primary dataset is the median annual earnings of different occupations (that
 <br><br>
 Our second dataset indicates that there are 175 different occupations that have entry level jobs requiring and only requiring a bachelors degree, but since some of them are missing income info, only around 160 of the occupations would be viable for analysis.
 <br><br>
-As we do not require all the data across the multiple datasets, they have been recompiled into a single table/csv file containing only the necessary data, which can be accessed via google sheets [here](https://).
+As we do not require all the data across the multiple datasets, they have been recompiled into a single table/csv file containing only the necessary data, which can be accessed via github [here](https://).
 <br><br>
 Finally, to answer our data science question we will also need to calculate the amount of money you have to take out in student loans for college by multiplying average college tuition of 4-year institutions by average interest rates of student loans. Data for average college tuition of 4-year institutions is sourced from [National Center for Education Statistics](https://nces.ed.gov/fastfacts/display.asp?id=76). 
