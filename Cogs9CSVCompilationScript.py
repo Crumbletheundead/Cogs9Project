@@ -44,3 +44,8 @@ def gather_ten():
         output = merge_master_year(output, csv_to_table((str(2017-i) + '.csv')), str(2017-i))
     
     return output
+
+def csvpls(df):
+    fileDirPath = os.path.dirname(os.path.realpath(__file__))
+    fullPath = os.path.join(fileDirPath, 'Cogs9FullDataset.csv')
+    df.to_csv(fullPath, encoding='utf-8')
