@@ -54,7 +54,11 @@ def gather_ten():
     #creates a dataframe for every single year's data and appends it into allYears list
     for i in range(11):
         print(i)
-        allYears.append(merge_master_year(master, csv_to_table((str(2017-i) + '.csv')), str(2017-i)))
+        allYears.append(merge_master_year(
+                            master, 
+                            csv_to_table((str(2017-i) + '.csv')), 
+                            str(2017-i)
+                        ))
     
     #smash everything together within allYears
     output = pd.concat(allYears)
