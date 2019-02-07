@@ -2,12 +2,11 @@
 """
 Created on Fri Jan 25 00:29:52 2019
 
-@author: JeffW
+@author: JeffWang
 """
 
 import pandas as pd
 import os
-#sys.path.append("D:\Cogs9\Cogs9Project")
 
 #load csv file in
 #set bachelorSource = True if csv loaded is EmploymentProjections.csv
@@ -19,19 +18,20 @@ def csv_to_table(fileName, bachelorSource = False):
     
     output = pd.read_csv(fullPath)
     
+    #drops the unnecessary columns from EmploymentProjections.csv and formates SOC code
     if bachelorSource:
         output = output[['Occupation Title', 'SOC Code', 'Typical entry-level education']]
         output['SOC Code'] = output.apply(lambda row: row['SOC Code'][2:9], axis = 1)
         
     return output
 
-#Merge a dataframe with csv files for each year
-#master and join = two dataframes you want to join
-    #joinYear is the year of the join dataframe
+#creates a dataframe for any given year's data
+#by joining it against the bachelor source SOC codes
+    #joinYear is the year of 'join' parameter dataframe
 def merge_master_year(master, join, joinYear):
 
     #since some years have different labels, renames columns so that they may be joined
-    #also drops the unnecessary columns from csvs for each year
+    #also drops the unnecessary columns from csvs for 'join' parameter
     if int(joinYear) >=2010:
         join = join[['OCC_CODE', 'A_MEDIAN']]
         join.columns = ['SOC Code', 'A_MEDIAN']
@@ -41,18 +41,26 @@ def merge_master_year(master, join, joinYear):
         join.columns = ['SOC Code', 'A_MEDIAN']
         
     #joins the columns after column renaming
-    output=  master.merge(join, how = 'inner', on= 'SOC Code',)
-    output = output.rename(columns = {'A_MEDIAN': joinYear+'_median_income'})
+    output=  master.merge(join, how = 'inner', on= 'SOC Code')
+    output['year'] = joinYear
     return output
 
-#uses aformentioned functions to read everything from directory, and returns everything in a single dataframe
+#uses aformentioned functions to read everything from directory
+#and returns everything in a single dataframe
 def gather_ten():
-    output = csv_to_table('EmploymentProjections.csv', bachelorSource = True)
+    master = csv_to_table('EmploymentProjections.csv', bachelorSource = True)
+    allYears = []
     
+    #creates a dataframe for every single year's data and appends it into allYears list
     for i in range(11):
         print(i)
-        output = merge_master_year(output, csv_to_table((str(2017-i) + '.csv')), str(2017-i))
+        allYears.append(merge_master_year(master, csv_to_table((str(2017-i) + '.csv')), str(2017-i)))
     
+    #smash everything together within allYears
+    output = pd.concat(allYears)
+    output = output.sort_values(['SOC Code', 'year'])
+    output.reset_index(drop = True, inplace = True)
+        
     return output
 
 #exports dataframe as csv
