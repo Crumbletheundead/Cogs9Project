@@ -63,7 +63,7 @@ def gather_ten(ipynb = False):
         print(i)
         allYears.append(merge_master_year(
                             master, 
-                            csv_to_table((str(2017-i) + '.csv')), 
+                            csv_to_table((str(2017-i) + '.csv'), online = ipynb), 
                             str(2017-i)
                         ))
     
