@@ -26,6 +26,8 @@ def csv_to_table(fileName, bachelorSource = False, online = False):
     output = pd.read_csv(fullPath)
     
     #drops the unnecessary columns from EmploymentProjections.csv and formates SOC code
+        #SOC stands for standardized occupational codes used by bureau of labor stats
+            #god bless bureacracies, saved me from writing another function just to merge data from different years
     if bachelorSource:
         output = output[['Occupation Title', 'SOC Code', 'Typical entry-level education']]
         output['SOC Code'] = output['SOC Code'].apply(lambda row: row[2:9])
@@ -47,10 +49,11 @@ def read_nces_xls(fileName, online = False):
     #only take the column showing year and the column showing 
     #average tuition every year for 4 year institutions
         #tuition is adjusted for inflation rate to reflect value during 2016-2017 school year
-    output = output[[output.columns[0], output.columns[1]]]
+    output = output[[output.columns[0], output.columns[2]]]
     output.columns = ['Year', 'Avg $ Tuition in 2016-17 $']
     
     #drop all the useless rows full of white spaces and messy labels
+        #I almost cried when I saw the xls data in a pandas dataframe
     #should only leave us with data from years 2006-2007 to 2016-2017
     output.drop(
                 list(range(67,output['Year'].size)),
@@ -64,7 +67,8 @@ def read_nces_xls(fileName, online = False):
     
     #cut the year string so that they are the year that school year ends on
     #we use the one the school year ends on because that's when you'll start working
-    #hence when you start having to pay your debts
+    #hence you won't need to pay next year's tuition
+        #this is still only like a third of what I pay as an international student ;_;
     output['Year'] = output['Year'].apply(lambda string: '20'+string[5:7])
     
     return output
@@ -76,6 +80,7 @@ def merge_master_year(master, join, joinYear):
 
     #since some years have different labels, renames columns so that they may be joined
     #also drops the unnecessary columns from csvs for 'join' parameter
+        #what witchery made them decide to capitalize their column labels starting 2010? 
     if int(joinYear) >=2010:
         join = join[['OCC_CODE', 'A_MEDIAN']]
         join.columns = ['SOC Code', 'Median Income']
