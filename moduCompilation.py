@@ -30,6 +30,7 @@ def csv_to_table(fileName, bachelorSource = False, online = False):
             #god bless bureacracies, saved me from writing another function just to merge data from different years
     if bachelorSource:
         output = output[['Occupation Title', 'SOC Code', 'Typical entry-level education']]
+        output = output.rename(columns = {'Typical entry-level education': 'Typical Education Required'})
         output['SOC Code'] = output['SOC Code'].apply(lambda row: row[2:9])
         
     return output
@@ -50,7 +51,7 @@ def read_nces_xls(fileName, online = False):
     #average tuition every year for 4 year institutions
         #tuition is adjusted for inflation rate to reflect value during 2016-2017 school year
     output = output[[output.columns[0], output.columns[2]]]
-    output.columns = ['Year', 'Avg $ Tuition in 2016-17 $']
+    output.columns = ['Year', 'Avg Tuition']
     
     #drop all the useless rows full of white spaces and messy labels
         #I almost cried when I saw the xls data in a pandas dataframe
