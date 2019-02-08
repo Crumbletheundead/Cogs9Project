@@ -68,10 +68,13 @@ def gather_ten(ipynb = False):
                         ))
     
     #smash everything together within allYears
+        #Sorts by soc code then the year 
+        #null values were entered as # in the original data, changed it to None 
+            #only the 2007 CEO median income was # anyways
     output = pd.concat(allYears)
     output = output.sort_values(['SOC Code', 'Year'])
     output.reset_index(drop = True, inplace = True)
-        
+    output['Median Income'] = output['Median Income'].apply(lambda row: 'None' if row == '#' else row)
     return output
 
 #exports dataframe as csv
