@@ -74,13 +74,15 @@ def read_nces_xls(fileName, online = False):
     return output
     
 #creates a dataframe for any given year's data
-#by joining it against the bachelor source SOC codes
+#by joining it innerly against the bachelor source SOC codes
+#This way only jobs that only require bachelor degrees show up, whilst all other jobs are dropped
+#this way also drops some odd calculations present in the bachelor source
     #joinYear is the year of 'join' parameter dataframe
 def merge_master_year(master, join, joinYear):
 
     #since some years have different labels, renames columns so that they may be joined
     #also drops the unnecessary columns from csvs for 'join' parameter
-        #what witchery made them decide to capitalize their column labels starting 2010? 
+      #what witchery made them decide to capitalize their column labels starting 2010? no clue 
     if int(joinYear) >=2010:
         join = join[['OCC_CODE', 'A_MEDIAN']]
         join.columns = ['SOC Code', 'Median Income']
@@ -95,8 +97,8 @@ def merge_master_year(master, join, joinYear):
     
     return output
 
-#uses aformentioned functions to read everything from directory
-#and returns everything in a single dataframe
+#uses aformentioned functions to read everything from directory or from my github page
+#and returns everything in a single dataframe, so we don't have to jump around 12 different tables constantly
     #set online to true if running on class ipynb
 def gather_ten(ipynb = False):
     checkBachelor = csv_to_table('EmploymentProjections.csv', bachelorSource = True, online = ipynb) 
@@ -112,6 +114,9 @@ def gather_ten(ipynb = False):
                         ))
     
     #smash everything together within allYears to make one giant table
+    #this way I can create a year column instead of having a column for every year's median income
+      #see I did the reading and went to lecture 
+      #if you're curious what the crappy table looked like check out our previous submission
     output = pd.concat(allYears)
     
     #call the tuition data and merge it into the master table
@@ -119,12 +124,15 @@ def gather_ten(ipynb = False):
     output = output.merge(tuition, on = 'Year')
     
     #cast every dtype into actual integers so it'll be easier to work with
+      #does this count as erasing tech debt
     output['Year'] = output['Year'].apply(lambda year: int(year))
     output['Median Income'] = output['Median Income'].apply(lambda income: tryInt(income))
     
-    #Sorts by soc code then the year 
+    #Sorts by soc code then the year
         #null values were entered as # in the original data, changed it to None 
             #only the 2007 CEO median income was # anyways
+    #this is all simply for the aesthetics honestly, data is already workable before this step
+      #but this way if you open it up in spyder it just looks so much better
     output = output.sort_values(['SOC Code', 'Year'])
     output.reset_index(drop = True, inplace = True)
     output['Median Income'] = output['Median Income'].apply(lambda row: 'None' if row == '#' else row)
