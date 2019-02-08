@@ -126,7 +126,7 @@ def gather_ten(ipynb = False):
     #cast every dtype into actual integers so it'll be easier to work with
       #does this count as erasing tech debt
     output['Year'] = output['Year'].apply(lambda year: int(year))
-    output['Median Income'] = output['Median Income'].apply(lambda income: tryInt(income))
+    output['Median Income'] = output['Median Income'].apply(tryInt)
     
     #Sorts by soc code then the year
         #null values were entered as # in the original data, changed it to None 
