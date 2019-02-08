@@ -10,11 +10,17 @@ import os
 
 #load csv file in
 #set bachelorSource = True if csv loaded is EmploymentProjections.csv
-def csv_to_table(fileName, bachelorSource = False):
+#set online to true if running on the class ipynb, god I love github they make life so easy
+def csv_to_table(fileName, bachelorSource = False, online = False):
     output = None
-
-    fileDirPath = os.path.dirname(os.path.realpath(__file__))
-    fullPath = os.path.join(fileDirPath, fileName)
+    
+    
+    if online:
+        githubBaseUrl = 'https://raw.githubusercontent.com/Crumbletheundead/Cogs9Project/master/'
+        fullPath = githubBaseUrl + fileName
+    else:
+        fileDirPath = os.path.dirname(os.path.realpath(__file__))
+        fullPath = os.path.join(fileDirPath, fileName)
     
     output = pd.read_csv(fullPath)
     
@@ -34,21 +40,22 @@ def merge_master_year(master, join, joinYear):
     #also drops the unnecessary columns from csvs for 'join' parameter
     if int(joinYear) >=2010:
         join = join[['OCC_CODE', 'A_MEDIAN']]
-        join.columns = ['SOC Code', 'A_MEDIAN']
+        join.columns = ['SOC Code', 'Median Income']
 
     else:
         join = join[['occ_code', 'a_median']]
-        join.columns = ['SOC Code', 'A_MEDIAN']
+        join.columns = ['SOC Code', 'Median Income']
         
     #joins the columns after column renaming
     output=  master.merge(join, how = 'inner', on= 'SOC Code')
-    output['year'] = joinYear
+    output['Year'] = joinYear
     return output
 
 #uses aformentioned functions to read everything from directory
 #and returns everything in a single dataframe
-def gather_ten():
-    master = csv_to_table('EmploymentProjections.csv', bachelorSource = True)
+    #set online to true if running on class ipynb
+def gather_ten(ipynb = False):
+    master = csv_to_table('EmploymentProjections.csv', bachelorSource = True, online = ipynb) 
     allYears = []
     
     #creates a dataframe for every single year's data and appends it into allYears list
@@ -62,7 +69,7 @@ def gather_ten():
     
     #smash everything together within allYears
     output = pd.concat(allYears)
-    output = output.sort_values(['SOC Code', 'year'])
+    output = output.sort_values(['SOC Code', 'Year'])
     output.reset_index(drop = True, inplace = True)
         
     return output
